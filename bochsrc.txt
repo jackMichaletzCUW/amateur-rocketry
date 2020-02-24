@@ -1,0 +1,10 @@
+megs:            32
+#display_library: sdl
+romimage:        file=/Applications/bochs-master/bios/BIOS-bochs-latest
+vgaromimage:     file=/Applications/bochs-master/bios/VGABIOS-lgpl-latest
+#ata0-master:     type=cdrom, path=/Users/jacmic/Downloads/dsl-4.11.rc1.iso, status=inserted
+ata0-master:     type=cdrom, path=os.iso, status=inserted
+boot:            cdrom
+log:             bochslog.txt
+clock:           sync=realtime, time0=local
+cpu:             count=1, ips=1000000
