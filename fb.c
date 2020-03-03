@@ -29,10 +29,18 @@ void scroll()
 {
     char* p = fb + 160;
     
+    // copy bottom 24 rows up by one
     for(int i = 0; i < (FB_SIZE * 2) - 160; i++)
     {
         *(p-160) = *p;
         p++;
+    }
+    
+    // zero out bottom row
+    for(int i = (FB_SIZE * 2) - 160; i < FB_SIZE * 2; i += 2)
+    {
+        fb[i] = ' ';
+        fb[i + 1] = (DEF_BG_COL << 4) | (DEF_FG_COL & 0x0F);
     }
     
     fb_move_cursor(FB_SIZE - 80);
@@ -46,8 +54,13 @@ void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg)
         scroll();
     }
     
-	fb[i] = c;
-	fb[i + 1] = (bg << 4) | (fg & 0x0F);
+    fb[i] = c;
+    fb[i + 1] = (bg << 4) | (fg & 0x0F);
+}
+
+void drawblock()
+{
+    fb_write_cell(fb_pos * 2, (char)0x0, 0xe, DEF_BG_COL);
 }
 
 void writechar(char c)
@@ -60,6 +73,7 @@ void writeinputchar(char c)
 {
     fb_write_cell(fb_pos * 2, c, 0xE, DEF_BG_COL);
     fb_move_cursor(++fb_pos);
+    drawblock();
 }
 
 void clr_scrn()
@@ -122,11 +136,20 @@ int write(char* str, unsigned int len)
 
 void newline()
 {
-    int spaces = 80 - (fb_pos % 80);
-    
-    fb_pos += spaces;
+    if(fb_pos < 1920)
+    {
+        int spaces = 80 - (fb_pos % 80);
+        
+        fb_pos += spaces;
+    }
+    else
+    {
+        scroll();
+    }
     
     fb_move_cursor(fb_pos);
+    
+    drawblock();
 }
 
 void writeint(int i)
