@@ -20,5 +20,5 @@ loader:
     mov esp, kernel_stack + KERNEL_STACK_SIZE
     mov eax, 0xBEEFBABE
     call main
-;.loop:
-;    jmp .loop
+.loop:
+    jmp .loop

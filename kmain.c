@@ -1,9 +1,13 @@
 #include "io.h"
 #include "fb.h"
 #include "kmem.h"
+#include "kinterrupts.h"
+#include "gdt.h"
 
 int main()
 {
+    gdt_init();
+    init_idt();
 	clr_scrn();
     
     //checkers(0, 15);
@@ -43,7 +47,7 @@ int main()
     
     meminit();
     
-    newline();
+    /*newline();
     
 	char* a;
     
@@ -86,9 +90,15 @@ int main()
     {
 	deal(5);
         writeupdateint(i);
-    }
+    }*/
+    newline();
+    newline();
     
-    while(1) {}
+    //for(;;) {
+     //   asm("hlt");
+    //}
+    
+    
     
 	return 0;
 }

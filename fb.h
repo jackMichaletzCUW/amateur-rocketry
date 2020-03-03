@@ -11,5 +11,6 @@ void scroll();
 void checkers();
 void writeupdateint(int i);
 void writechar(char c);
+void writeinputchar(char c);
 
 #endif

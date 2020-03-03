@@ -56,6 +56,12 @@ void writechar(char c)
     fb_move_cursor(++fb_pos);
 }
 
+void writeinputchar(char c)
+{
+    fb_write_cell(fb_pos * 2, c, 0xE, DEF_BG_COL);
+    fb_move_cursor(++fb_pos);
+}
+
 void clr_scrn()
 {
 	for(int i = 0; i < FB_SIZE; i++)
