@@ -1,4 +1,6 @@
 #include "io.h"
+#include "fb.h"
+#include "string.h"
 
 #define FB_COMMAND_PORT         0x3D4
 #define FB_DATA_PORT            0x3D5
@@ -13,6 +15,7 @@
 #define DEF_BG_COL 0x0
 #define DEF_FG_COL 0xD
 #define INT_COL 0xA
+#define BYTE_COL 0x7
 
 char *fb = (char *) 0x000B8000;
 int fb_pos = 0; // current frame buffer position
@@ -69,6 +72,20 @@ void writechar(char c)
     fb_move_cursor(++fb_pos);
 }
 
+void removechar()
+{
+    fb_pos--;
+    fb_write_cell(fb_pos*2, ' ', DEF_BG_COL, DEF_BG_COL);
+    fb_move_cursor(fb_pos);
+    drawblock();
+}
+
+void writecolorchar(char c, unsigned int color)
+{
+    fb_write_cell(fb_pos*2, c, color, DEF_BG_COL);
+    fb_move_cursor(++fb_pos);
+}
+
 void writeinputchar(char c)
 {
     fb_write_cell(fb_pos * 2, c, 0xE, DEF_BG_COL);
@@ -85,6 +102,59 @@ void clr_scrn()
     
     fb_move_cursor(0);
     fb_pos = 0;
+}
+
+void writebytes(char* start, int count, int columns)
+{
+    for (int i = 0; i<count; i++) {
+        if (i % columns == 0) {
+            newline();
+        }
+        
+        writebyte(*(start + i));
+        write(" ", 1);
+    }
+}
+
+void writebyte(char byte)
+{
+    if((fb_pos + 4) > FB_SIZE)
+    {
+        scroll();
+    }
+    
+    fb_write_cell(fb_pos * 2, '0', BYTE_COL, DEF_BG_COL);
+    fb_move_cursor(++fb_pos);
+    
+    fb_write_cell(fb_pos * 2, 'x', BYTE_COL, DEF_BG_COL);
+    fb_move_cursor(++fb_pos);
+    
+    char lh = (byte & 0xF0) >> 4;
+    char rh = byte & 0x0F;
+    
+    if(lh < 10)
+    {
+        lh += 48;
+    }
+    else
+    {
+        lh += 55;
+    }
+    
+    if(rh < 10)
+    {
+        rh += 48;
+    }
+    else
+    {
+        rh += 55;
+    }
+    
+    fb_write_cell(fb_pos * 2, lh, BYTE_COL, DEF_BG_COL);
+    fb_move_cursor(++fb_pos);
+    
+    fb_write_cell(fb_pos * 2, rh, BYTE_COL, DEF_BG_COL);
+    fb_move_cursor(++fb_pos);
 }
 
 void checkers(char c1, char c2)
@@ -118,7 +188,7 @@ void checkers(char c1, char c2)
     }
 }
 
-int write(char* str, unsigned int len)
+void write(char* str, unsigned int len)
 {
     if((fb_pos + len) > FB_SIZE)
     {
@@ -130,8 +200,11 @@ int write(char* str, unsigned int len)
 		fb_write_cell(fb_pos * 2, str[i], DEF_FG_COL, DEF_BG_COL);
 		fb_move_cursor(++fb_pos);
 	}
+}
 
-	return 0;
+void writestr(char* target)
+{
+    write(target, stringSize(target));
 }
 
 void newline()

@@ -1,6 +1,7 @@
 #include "fb.h"
 #include "pic.h"
 #include "kinterrupts.h"
+#include "prompt.h"
 
 #define KBD_DATA_PORT 0x60
 
@@ -39,15 +40,19 @@ void interrupt_handler(__attribute__((unused)) struct cpu_state cpu, unsigned in
         
         char letter = keyboard_scan_code_to_ascii[scan_code];
         
-        if(letter != 0x0)
+        if(!(scan_code >> 7))
         {
-            if(letter != '\n')
+            if(scan_code == 0x1C)
             {
-                writeinputchar(keyboard_scan_code_to_ascii[scan_code]);
+                promptRun();
+            }
+            else if(scan_code == 0x0E)
+            {
+                promptDelete();
             }
             else
             {
-                newline();
+                promptInput(letter);
             }
         }
         

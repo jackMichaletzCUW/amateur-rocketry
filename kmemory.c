@@ -1,11 +1,5 @@
 #include "fb.h"
 
-char* mem_end_ptr = (char *) 0x1F00000;
-char* idx_start_ptr = (char *) 0x300000;
-
-char* mem_start_ptr;
-int offset;
-
 //int firstblank = 0;
 
 /*char pointer*/
@@ -45,16 +39,28 @@ void setBitToOne (int bitPos,int count)
 {
     char* target =  originalByte + (bitPos/8);
     
-    *target |= (1 << (7 - (bitPos % 8)));
+    /**target |= (1 << (7 - (bitPos % 8)));
 
     // possible recursion stack overflow?? might have to rewrite as iterative in order for large allocations to work
     if (count > 1)
     {
         setBitToOne (bitPos + 1 , count - 1);
+    }*/
+    
+    // iterative way
+    while (count>0) {
+        *target |= (1 << (7 - (bitPos % 8)));
+        
+        bitPos++;
+        count--;
+        
+        if (bitPos % 8 == 0) {
+            target++;
+        }
     }
 }
 
-char* yoink(int numByte)
+char* memoryAllocate(int numByte)
 {
     int count = 0;
     int bitCount = 0;
@@ -87,92 +93,24 @@ char* yoink(int numByte)
     return (char*)0xCAFEBABE;
 }
 
-void kmeminit()
+unsigned int memoryFree(char* address, unsigned int size)
 {
-    int delta = (int)mem_end_ptr - (int)idx_start_ptr;
+    int offset = (int)(address - memoryStartPointer);
+    char* targetByte = originalByte + (offset / 8);
     
-    offset = delta / 8;
+    int bitOffset = offset % 8;
     
-    mem_start_ptr = idx_start_ptr + offset;
-    
-    write("KMEMINIT:", 9); newline();
-    write("  IDX_START_PTR: ", 17); writeint(idx_start_ptr); newline();
-    write("  MEM_START_PTR: ", 17); writeint(mem_start_ptr); newline();
-    write("  MEM_END_PTR  : ", 17); writeint(mem_end_ptr); newline();
-    newline();
-}
-
-unsigned int kfree(char* address, unsigned int size)
-{
-    
-}
-
-char* kalloc(unsigned int size)
-{
-    char* aptr = idx_start_ptr;
-    
-    unsigned int bitcount = 0;
-    unsigned int linesize = 0;
-    
-    while(aptr < mem_start_ptr)
-    {
-        for(unsigned int i = 0; i < 8; i++)
-        {
-            if(linesize == size)
-            {
-                if(linesize <= (i + 1))
-                {
-                    *aptr |= ((0xFF >> ((i + 1) - linesize)) & (0xFF << 7 - i));
-                    
-                    //return mem_start_ptr + (((int)aptr - (int)idx_start_ptr) * 8) + ((i + 1) - linesize);
-                    return mem_start_ptr + (bitcount - size);
-                }
-                else
-                {
-                    unsigned int ls = linesize;
-                    
-                    for(int j = i; j >= 0; j--)
-                    {
-                        *aptr |= 0x1 << (7 - j);
-                        
-                        ls--;
-                    }
-                    
-                    aptr--;
-                    
-                    while(ls != 0)
-                    {
-                        for(int j = 7; j >= 0; j--)
-                        {
-                            if(ls > 0)
-                            {
-                                *aptr |= 0x1 << (7 - j);
-                            
-                                ls--;
-                            }
-                            else
-                            {
-                                return mem_start_ptr + (bitcount - size);
-                            }
-                        }
-                        
-                        aptr--;
-                    }
-                }
-            }
-            
-            if((*aptr >> i) ^ 0x1)
-            {
-                linesize++;
-            }
-            else
-            {
-                linesize = 0;
-            }
-            
-            bitcount++;
+    while (size>0) {
+        *targetByte &= (0xFF & ~(1 << (7-bitOffset)));
+        
+        bitOffset++;
+        size--;
+        
+        if (bitOffset == 8) {
+            bitOffset = 0;
+            targetByte++;
         }
-               
-        aptr++;
     }
+    
+    return 0xDEADBABE;
 }
