@@ -45,7 +45,7 @@ void setBitToOne (int bitPos,int count)
     if (count > 1)
     {
         setBitToOne (bitPos + 1 , count - 1);
-    }*/
+    }**/
     
     // iterative way
     while (count>0) {
