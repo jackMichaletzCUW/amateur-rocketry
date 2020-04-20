@@ -5,6 +5,17 @@
 #include "gdt.h"
 #include "string.h"
 #include "prompt.h"
+#include "imaging.h"
+
+typedef long unsigned int size_t;
+
+void* memcpy(void* restrict dstptr, const void* restrict srcptr, size_t size) {
+    unsigned char* dst = (unsigned char*) dstptr;
+    const unsigned char* src = (const unsigned char*) srcptr;
+    for (size_t i = 0; i < size; i++)
+        dst[i] = src[i];
+    return dstptr;
+}
 
 int main()
 {
@@ -12,33 +23,13 @@ int main()
     init_idt();
 	clr_scrn();
     
-    //checkers(0, 15);
+    toggleBlinking();
     
-    newline();
-    writechar(' ');
-    writechar(201);
-    for(int i = 0; i < 32; i++) { writechar(205); }
-    writechar(187); newline();
-    writechar(' ');
-    writechar(186);
-    write(" a m a t e u r  r o c k e t r y ", 32);
-    writechar(186);
-    newline();
-    writechar(' ');
-    writechar(200);
-    for(int i = 0; i < 32; i++) { writechar(205); }
-    writechar(188); newline();
-    newline();
+    imageDisplaySplash();
     
     memoryInitialize();
     
     promptInitialize("amateur rocketry> ");
-    
-    //writestr("feep");
-    // char** list = stringTokenize("whose toes are those", ' ');
-    // writeint((int)(*list));
-    // writebytes((char*)list, 20, 4);
-    // stringPrintList(list);
     
 	return 0;
 }

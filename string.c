@@ -138,8 +138,12 @@ void stringPrintList(char** target)
     for (int i = 0; i < listSize; i++) {
         writestr(*(target + i));
         
+        write(" (", 2);
+        writeint((int)(*(target + i)));
+        write(")", 1);
+        
         if (i != (listSize - 1)) {
-            write(",", 1);
+            write(", ", 2);
         }
     }
     

@@ -11,6 +11,42 @@ void memoryInitialize()
 {
     memoryStartPointer = originalByte + ((endByte - originalByte) / 9);
     
+    int characterSize = ((int)endByte - (int)originalByte) / 2000;
+    
+    writestr("clearing memory...  ");
+    
+    for (char* i = originalByte; i < endByte-1; i++) {
+        *i = 0x00;
+        
+        if ((int)i % 0x100000 == 0) {
+            writeupdateint((int)i);
+        }
+        
+        /*if ((int)i % characterSize == 0) {
+            *((((char*)0xB8000) + ( ( ( (int)i - (int)originalByte ) / characterSize ) * 2) ) + 1)  |= 0xF0;
+           // writechar(' ');
+        }*/
+    }
+    
+    clr_scrn();
+    
+    newline();
+    writechar(' ');
+    writechar(201);
+    for(int i = 0; i < 32; i++) { writechar(205); }
+    writechar(187); newline();
+    writechar(' ');
+    writechar(186);
+    write(" a m a t e u r  r o c k e t r y ", 32);
+    writechar(186);
+    newline();
+    writechar(' ');
+    writechar(200);
+    for(int i = 0; i < 32; i++) { writechar(205); }
+    writechar(188); newline();
+    newline();
+    
+    
     write("meminit:", 9); newline();
     writechar(' '); writechar(186); writechar(' ');
     write("allocation table start : ", 25); writeint(originalByte); newline();

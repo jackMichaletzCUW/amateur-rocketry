@@ -1,4 +1,4 @@
-OBJECTS = loader.o io.o fb.o kmemory.o prompt.o string.o gdt.o gdt_asm.o kmain.o pic.o kinterrupts.o kinterrupts_asm.o idt_setup.o
+OBJECTS = loader.o io.o fb.o kmemory.o prompt.o string.o imaging.o gdt.o gdt_asm.o kmain.o pic.o kinterrupts.o kinterrupts_asm.o idt_setup.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 		--target=i386-jos-elf -nostartfiles -ffreestanding -nodefaultlibs -Wall -Wextra -c

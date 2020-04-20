@@ -1,6 +1,7 @@
 #include "io.h"
 #include "fb.h"
 #include "string.h"
+#include "imaging.h"
 
 #define FB_COMMAND_PORT         0x3D4
 #define FB_DATA_PORT            0x3D5
@@ -26,6 +27,12 @@ void fb_move_cursor(unsigned short pos)
     outb(FB_DATA_PORT,    ((pos >> 8) & 0x00FF));
     outb(FB_COMMAND_PORT, FB_LOW_BYTE_COMMAND);
     outb(FB_DATA_PORT,    pos & 0x00FF);
+}
+
+void fb_disable_cursor()
+{
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, 0x20);
 }
 
 void scroll()
@@ -227,8 +234,7 @@ void newline()
 
 void writeint(int i)
 {
-    if((fb_pos + 10) > FB_SIZE)
-    {
+    if((fb_pos + 10) > FB_SIZE) {
         scroll();
     }
     
@@ -247,21 +253,15 @@ void writeint(int i)
         char lh = (byte & 0xF0) >> 4;
         char rh = byte & 0x0F;
         
-        if(lh < 10)
-        {
+        if(lh < 10) {
             lh += 48;
-        }
-        else
-        {
+        } else {
             lh += 55;
         }
         
-        if(rh < 10)
-        {
+        if(rh < 10) {
             rh += 48;
-        }
-        else
-        {
+        } else {
             rh += 55;
         }
         
